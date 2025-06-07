@@ -21,12 +21,10 @@ class CustomEmbeddingModel(DeepEvalBaseEmbeddingModel):
         return embedding_model.embed_documents(texts)
 
     async def a_embed_text(self, text: str) -> List[float]:
-        embedding_model = self.load_model()
-        return await embedding_model.aembed_query(text)
+       return self.embed_text(text)
 
     async def a_embed_texts(self, texts: List[str]) -> List[List[float]]:
-        embedding_model = self.load_model()
-        return await embedding_model.aembed_documents(texts)
+        return self.embed_texts(texts)
 
     def get_model_name(self):
         "Custom Mistral-7B-Instruct-v0.3 tokenizer"
