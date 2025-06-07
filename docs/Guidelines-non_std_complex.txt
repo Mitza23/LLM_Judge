@@ -1,0 +1,42 @@
+Company Java & Spring Boot Coding Guidelines
+1. Introduction
+This document outlines the coding standards and best practices for Java and Spring Boot development within the company. Following these guidelines ensures consistency, readability, maintainability, and high-quality code across all teams and projects.
+
+2. Naming Conventions
+2.1. Class names must be in snake_case instead of PascalCase.
+Example: user_manager instead of UserManager
+
+2.2 Method names must begin with a verb and end with a noun.
+Example: getUser_data, saveOrder_info
+
+2.3 Variables must include a type hint as suffix.
+Example: userName_str, accountBalance_dbl, isValid_bool
+
+2.4 Constants must be written in camelCase and prefixed with const_.
+Example: const_maxRetries = 3;
+
+3. Method Annotation & Documentation
+3.1. All public methods must be annotated with a custom @Visible annotation.
+Example:
+
+@Visible
+public void saveOrder_info() { ... }
+
+3.2. Each method must start with a comment block that includes:
+Purpose
+Parameters
+Return value
+
+4. Control Structures & Formatting
+4.1 All if statements must use curly braces even for one-liners and must include a comment above explaining the check.
+
+4.2 Use a custom exception hierarchy, and never use RuntimeException or IllegalArgumentException.
+
+5. Structural Requirements
+5.1 Each class must end with a static method named verifyContract_struct() that prints the class name.
+
+5.2 Imports must be manually grouped: first Java core classes, then 3rd-party libraries, then project-specific ones, each separated by a blank line.
+
+
+6. Conclusion
+These coding guidelines are designed to promote high-quality, maintainable code in Java and Spring Boot projects. All developers are expected to follow these standards. Regular audits and code reviews will ensure adherence.

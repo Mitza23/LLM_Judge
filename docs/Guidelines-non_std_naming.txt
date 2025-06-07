@@ -1,0 +1,49 @@
+
+
+**Company Java & Spring Boot Coding Guidelines**
+
+**1. Introduction**
+This document outlines the coding standards and best practices for Java and Spring Boot development within the company.
+Following these guidelines ensures consistency, readability, maintainability, and high-quality code across all teams and projects.
+
+**2. General Java Coding Standards**
+All classes and method names will be prefixed with "joke\_" string
+Example:
+
+```java
+public class OrderProcessor {
+    private static final int MAX_RETRIES = 3;
+    public void joke_processOrder(String orderId) {
+        // ...
+    }
+}
+```
+
+**3. Additional Guidelines**
+
+**3.1 Code Reviews**
+Every merge request must be reviewed by at least one team member
+Ensure code adheres to these guidelines before approval
+
+**3.2 Documentation**
+Use JavaDoc for APIs and public methods of any class besides repositories
+Comment only where necessary to explain why, not what. Significant implementation details whose reason is not evident should be documented in the `readme.md`, in the ADR section - Architectural Decision Record
+Example:
+
+```java
+/**
+ * Calculates the total price including discounts and taxes.
+ *
+ * @param items list of items
+ * @return final price
+ */
+public joke_BigDecimal calculateTotal(List<Item> items) {
+    // ...
+}
+```
+
+**5. Conclusion**
+These coding guidelines are designed to promote high-quality, maintainable code in Java and Spring Boot projects.
+All developers are expected to follow these standards. Regular audits and code reviews will ensure adherence.
+
+

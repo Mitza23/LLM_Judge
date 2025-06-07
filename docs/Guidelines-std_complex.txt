@@ -1,0 +1,208 @@
+Company Java & Spring Boot Coding Guidelines
+1. Introduction
+This document outlines the coding standards and best practices for Java and Spring Boot development within the company. Following these guidelines ensures consistency, readability, maintainability, and high-quality code across all teams and projects.
+
+2. General Java Coding Standards
+2.1 Naming Conventions
+Classes: Use PascalCase (e.g., CustomerService)
+Methods: Use camelCase (e.g., calculateTotal)
+Variables: Use camelCase (e.g., userName)
+Constants: Use UPPER_SNAKE_CASE (e.g., MAX_RETRIES)
+Packages: Use all lowercase (e.g., com.company.project.service)
+
+
+Example:
+public class OrderProcessor {
+
+    private static final int MAX_RETRIES = 3;
+    public void processOrder(String orderId) {
+        // ...
+    }
+}
+
+
+2.2 Code Formatting
+Indentation: 4 spaces, no tabs
+Line length: Max 120 characters
+Braces: Always use braces, even for single-line blocks
+File structure:
+
+
+Package declaration
+Imports (sorted and grouped)
+Class declaration
+
+2.3 Exception Handling
+Never swallow exceptions
+Use custom exceptions where appropriate
+Always log the exception with context
+
+
+Example:
+try {
+    orderService.placeOrder(order);
+} catch (PaymentException e) {
+    log.error("Payment failed for order ID: {}", order.getId(), e);
+    throw new OrderProcessingException("Payment failed", e);
+}
+
+
+3. Spring Boot Best Practices
+3.1 Project Structure
+Structure your back-end code in `api`, `app` and `data` packages. 
+Classes that contain endpoint definitions are named Resources instead of Controllers and are placed in the `api` package, along with other api-level classes like input DTOs and ControllerAdvices.
+The `app` package will contain all the business logic of the application which is implemented in Translator, Service and Facade classes. Here are also other classes like Client classes to other apps and services
+The `data` package defines the database entities the app directly works with and all the Repository classes which make operations on the database.
+
+3.2 Dependency Injection
+Always use constructor injection
+Avoid field injection
+
+
+Bad:
+@Autowired
+private OrderService orderService;
+
+Good:
+@Service
+@RequiredArgsConstructor
+public class OrderController {
+
+    private final OrderService orderService;
+
+}
+
+
+3.3 Configuration Management
+Use application.yml instead of application.properties
+Externalize environment-specific configurations
+Use @ConfigurationProperties for structured configs
+
+
+Example:
+order:
+  max-items: 10
+
+@ConfigurationProperties(prefix = "order")
+@Component
+@Getter
+@Setter
+public class OrderConfig {
+    private int maxItems;
+    // getters and setters
+}
+
+
+3.4 REST API Design
+Use meaningful and consistent URI patterns
+Use appropriate HTTP verbs (GET, POST, PUT, DELETE)
+Return standardized response bodies (e.g., with status, message, data)
+
+
+Example:
+@RestController
+@RequestMapping("/api/orders")
+public class OrderController {
+
+    @GetMapping("/{id}")
+    public ResponseEntity<OrderDto> getOrder(@PathVariable Long id) {
+        OrderDto order = orderService.getOrderById(id);
+        return ResponseEntity.ok(order);
+    }
+}
+
+
+3.5 API Security
+Each endpoint should be secured with the custom @Requires([list_of_roles]) OAuth role verification annotation
+
+
+Example:
+@RestController
+@RequestMapping("/api/orders")
+public class OrderController {
+
+    @GetMapping("/{id}")
+    @Requires([“ITW_ORDER_CREATE”, “ITW_ORDER_USER”])
+    public ResponseEntity<OrderDto> createOrder(@Body OrderDTO order) {
+orderService.create(order);       
+return ResponseEntity.ok(order);
+    }
+}
+
+
+
+3.6 Logging
+Use SLF4J for logging
+Do not log sensitive data
+Use parameterized logging
+Annotate each class that will use a logger with @Slf4j
+Logging level in production is set to INFO. Can be changed to DEBUG or TRACE for finite amounts of time if necessary
+Use log.error for every scenario that causes and Exception or Error to be thrown
+Use log.warn for every scenario where data is in an unexpected state, but does not cause Exceptions/Errors
+Use log.info for logging major successful events or steps in the application flow
+Use log.debug only for developer relevant metrics, but they won’t show in production on long term
+Use log.trace mostly for local debugging.
+
+
+Example:
+log.info("User {} requested order {}", username, orderId);
+
+
+3.7 Unit and Integration Testing
+Use JUnit 5 and Mockito for unit tests
+Use @SpringBootTest for integration tests
+Name test methods clearly to express behavior
+
+
+Example:
+@Test
+void shouldReturnOrderWhenValidIdGiven() {
+    when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+
+    Order result = orderService.getOrderById(1L);
+
+    assertNotNull(result);
+}
+
+
+3.8 ORM and data manipulation
+Use JPA with Hibernate
+No N+1 query problems are allowed
+Use `join fetch` whenever needed, fallback to using `@EntityGraph` if `join fetch` is not possible
+Use JPA inferred query methods when possible, use HQL for more complex situations and table joins
+Native queries are only allowed if HQL could not provide the desired functionality
+
+
+Example:
+@Query(“””
+Select *
+From Order o
+Join fetch o.customer c
+Where o.createdDate = :date
+“””)
+List<Order> findOrdersByDate(LocalDate date) {
+    }
+
+
+4. Additional Guidelines
+4.1 Code Reviews
+Every merge request must be reviewed by at least one team member
+Ensure code adheres to these guidelines before approval
+4.2 Documentation
+Use JavaDoc for APIs and public methods of any class besides repositories
+Comment only where necessary to explain why, not what
+Significant implementation details whose reason is not evident should be documented in the readme.md , in the ADR section - Architectural Decision Record
+Example:
+/**
+ * Calculates the total price including discounts and taxes.
+ *
+ * @param items list of items
+ * @return final price
+ */
+public BigDecimal calculateTotal(List<Item> items) {
+    // ...
+}
+
+
+5. Conclusion
+These coding guidelines are designed to promote high-quality, maintainable code in Java and Spring Boot projects. All developers are expected to follow these standards. Regular audits and code reviews will ensure adherence.
