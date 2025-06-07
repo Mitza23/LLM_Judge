@@ -8,7 +8,7 @@ from model import CustomMistral7B
 
 synthesizer = Synthesizer(model=CustomMistral7B())
 
-context_config = ContextConstructionConfig(embedder=CustomEmbeddingModel())
+context_config = ContextConstructionConfig(embedder=CustomEmbeddingModel(), critic_model=CustomMistral7B())
 synthesizer.generate_goldens_from_docs(
     document_paths=['docs/Guidelines-non_std_complex.txt'],
     include_expected_output=True,
