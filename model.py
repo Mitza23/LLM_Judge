@@ -16,7 +16,7 @@ class CustomMistral7B(DeepEvalBaseLLM):
     def generate(self, prompt: str) -> str:
         model = self.load_model()
 
-        device = "cuda" # the device to load the model onto
+        device = "cpu" # the device to load the model onto
 
         model_inputs = self.tokenizer([prompt], return_tensors="pt").to(device)
         model.to(device)
