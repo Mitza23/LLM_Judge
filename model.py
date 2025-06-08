@@ -55,7 +55,7 @@ class CustomMistral7B(DeepEvalBaseLLM):
 
             generated_ids = model.generate(
                 **model_inputs,
-                max_new_tokens=1000,
+                max_new_tokens=10000,
                 do_sample=True,
                 temperature=0.3,
                 top_p=0.9,
