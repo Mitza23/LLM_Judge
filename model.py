@@ -21,7 +21,7 @@ class CustomMistral7B(DeepEvalBaseLLM):
         model = self.load_model()
 
         # Use GPU if available, otherwise CPU
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        device = "cpu"
 
         # Apply chat template if available
         if hasattr(self.tokenizer, 'apply_chat_template'):
