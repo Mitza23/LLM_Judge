@@ -29,7 +29,7 @@ class CustomMistral7B(DeepEvalBaseLLM):
         model = self.load_model()
 
         # Use GPU if available, otherwise CPU
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        device = "cpu"
 
         # If no schema provided, use simple generation
         if schema is None:
