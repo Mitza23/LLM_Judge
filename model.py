@@ -1,5 +1,6 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from deepeval.models.base_model import DeepEvalBaseLLM
+import torch
 
 class CustomMistral7B(DeepEvalBaseLLM):
     def __init__(
@@ -9,29 +10,61 @@ class CustomMistral7B(DeepEvalBaseLLM):
     ):
         self.model = model
         self.tokenizer = tokenizer
+        # Set pad token if not already set
+        if self.tokenizer.pad_token is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
 
     def load_model(self):
         return self.model
 
-    def generate(self, prompt: str) -> str:
+    def generate(self, prompt: str, schema=None) -> str:
         model = self.load_model()
 
-        device = "cpu" # the device to load the model onto
+        # Use GPU if available, otherwise CPU
+        device = "cuda" if torch.cuda.is_available() else "cpu"
 
-        model_inputs = self.tokenizer([prompt], return_tensors="pt").to(device)
+        # Apply chat template if available
+        if hasattr(self.tokenizer, 'apply_chat_template'):
+            messages = [{"role": "user", "content": prompt}]
+            formatted_prompt = self.tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True
+            )
+        else:
+            formatted_prompt = prompt
+
+        model_inputs = self.tokenizer(
+            [formatted_prompt],
+            return_tensors="pt",
+            padding=True,
+            truncation=True
+        ).to(device)
+
         model.to(device)
 
-        generated_ids = model.generate(**model_inputs, max_new_tokens=100, do_sample=True)
-        return self.tokenizer.batch_decode(generated_ids)[0]
+        # Generate with better parameters for JSON output
+        generated_ids = model.generate(
+            **model_inputs,
+            max_new_tokens=1000,  # Increased for better JSON generation
+            do_sample=True,
+            temperature=0.3,     # Lower temperature for more consistent output
+            top_p=0.9,
+            pad_token_id=self.tokenizer.pad_token_id,
+            eos_token_id=self.tokenizer.eos_token_id,
+            repetition_penalty=1.1
+        )
 
-    async def a_generate(self, prompt: str) -> str:
-        return self.generate(prompt)
+        # Decode only the new tokens (excluding the input prompt)
+        input_length = model_inputs['input_ids'].shape[1]
+        generated_tokens = generated_ids[0][input_length:]
+        response = self.tokenizer.decode(generated_tokens, skip_special_tokens=True)
+
+        return response.strip()
+
+    async def a_generate(self, prompt: str, schema=None) -> str:
+        # Accept schema parameter and pass it to generate
+        return self.generate(prompt, schema=schema)
 
     def get_model_name(self):
         return "Mistral-7B-Instruct-v0.3"
-
-# model = AutoModelForCausalLM.from_pretrained("mistralai/Mistral-7B-Instruct-v0.3")
-# tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-Instruct-v0.3")
-#
-# mistral_7b = Mistral7B(model=model, tokenizer=tokenizer)
-# print(mistral_7b.generate("Write me a joke"))
