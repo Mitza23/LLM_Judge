@@ -1,7 +1,7 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from deepeval.models.base_model import DeepEvalBaseLLM
 
-class Mistral7B(DeepEvalBaseLLM):
+class CustomMistral7B(DeepEvalBaseLLM):
     def __init__(
             self,
             model,
