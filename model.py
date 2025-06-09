@@ -95,7 +95,7 @@ class CustomMistral7B(DeepEvalBaseLLM):
     def generate(self, prompt: str, schema=None) -> str:
         """Standard generate method."""
         model = self.load_model()
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        device = "cpu"
 
         # Apply chat template if available
         if hasattr(self.tokenizer, 'apply_chat_template'):
