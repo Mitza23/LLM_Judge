@@ -43,7 +43,7 @@ class CustomMistral7B(DeepEvalBaseLLM):
     def _generate_with_schema(self, prompt: str, schema: BaseModel) -> str:
         """Generate text with enforced JSON schema."""
         model = self.load_model()
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        device = "cpu"
 
         # Apply chat template
         if hasattr(self.tokenizer, 'apply_chat_template'):
