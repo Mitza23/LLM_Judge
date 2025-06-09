@@ -13,7 +13,7 @@ class CustomEmbeddingModel(DeepEvalBaseEmbeddingModel):
         self.max_length = max_length
         self.tokenizer = None
         self.model = None
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.device = 'cpu'
 
     def load_model(self):
         """Load the tokenizer and model"""
